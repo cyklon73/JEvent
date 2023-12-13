@@ -3,7 +3,6 @@ package de.cyklon.jevent;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class CancellableEvent extends Event implements Cancellable {
-
 	private boolean cancelled = false;
 
 	protected CancellableEvent() {
