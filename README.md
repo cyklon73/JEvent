@@ -1,6 +1,10 @@
 ![[Java CI]](https://github.com/Utils4J/JEvent/actions/workflows/check.yml/badge.svg)
 ![[Latest Version]](https://maven.mineking.dev/api/badge/latest/releases/de/cyklon/JEvent?prefix=v&name=Latest%20Version)
 
+# JEvent
+
+JEvent provides a powerful and lightweight event system based on the syntax of the [Spigot Event System](https://www.spigotmc.org/wiki/using-the-event-api/).
+
 # Installation
 
 DiscordUtils is hosted on a custom repository at [https://maven.mineking.dev](https://maven.mineking.dev/#/releases/de/cyklon/JEvent). Replace VERSION with the lastest version (without the `v` prefix).
@@ -36,8 +40,3 @@ dependencies {
   </dependency>
 </dependencies>
 ```
-
-# Description
-Lightweight Java Event System
-
-JEvent provides a powerful and lightweight event system based on the syntax of the <a href="https://www.spigotmc.org/wiki/using-the-event-api/">Spigot event</a> system
