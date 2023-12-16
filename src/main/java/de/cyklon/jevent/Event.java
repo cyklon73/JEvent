@@ -38,9 +38,7 @@ public abstract class Event {
 	 * @see EventManager#callEvent(Event)
 	 */
 	public boolean callEvent() {
-		JEvent.MANAGER.callEvent(this);
-		if(this instanceof Cancellable) return ((Cancellable) this).isCancelled();
-		return false;
+		return JEvent.MANAGER.callEvent(this);
 	}
 
 	/**

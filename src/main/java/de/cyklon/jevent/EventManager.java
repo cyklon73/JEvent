@@ -31,6 +31,7 @@ public sealed interface EventManager permits JEvent {
 	 * calls the passed event and executes all registered listeners, as well as all listeners registered for a superclass of the event
 	 *
 	 * @param event the event to be executed
+	 * @return Whether the event was canceled
 	 */
-	void callEvent(@NotNull Event event);
+	boolean callEvent(@NotNull Event event);
 }

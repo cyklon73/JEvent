@@ -21,13 +21,13 @@ public final class JEvent implements EventManager {
 		return MANAGER;
 	}
 
-	private final Collection<Handler> HANDLER_LIST = new ArrayList<>();
+	private final Collection<Handler> handlers = new ArrayList<>();
 
 	private JEvent() {}
 
 	@NotNull
 	private Collection<Handler> getHandlers(@NotNull Class<? extends Event> event) {
-		return HANDLER_LIST.stream()
+		return handlers.stream()
 				.filter(h -> h.isSuitableHandler(event))
 				.sorted()
 				.toList();
@@ -35,21 +35,22 @@ public final class JEvent implements EventManager {
 
 	@Override
 	public void registerListener(@NotNull Object obj) {
-		HANDLER_LIST.addAll(Handler.getHandlers(obj));
+		handlers.addAll(Handler.getHandlers(obj));
 	}
 
 	@Override
 	public void unregisterListener(@NotNull Class<?> clazz) {
-		HANDLER_LIST.removeIf(h -> h.getListener().getClass().isInstance(clazz));
+		handlers.removeIf(h -> h.getListener().getClass().isInstance(clazz));
 	}
 
 	@Override
 	public void unregisterAll() {
-		HANDLER_LIST.clear();
+		handlers.clear();
 	}
 
 	@Override
-	public void callEvent(@NotNull Event event) {
+	public boolean callEvent(@NotNull Event event) {
 		getHandlers(event.getClass()).forEach(h -> h.invoke(event));
+		return event instanceof Cancellable ce && ce.isCancelled();
 	}
 }
