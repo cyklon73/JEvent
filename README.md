@@ -7,7 +7,7 @@ JEvent provides a powerful and lightweight event system based on the syntax of t
 
 # Installation
 
-DiscordUtils is hosted on a custom repository at [https://maven.mineking.dev](https://maven.mineking.dev/#/releases/de/cyklon/JEvent). Replace VERSION with the lastest version (without the `v` prefix).
+JEvent is hosted on a custom repository at [https://maven.mineking.dev](https://maven.mineking.dev/#/releases/de/cyklon/JEvent). Replace VERSION with the lastest version (without the `v` prefix).
 Alternatively, you can download the artifacts from jitpack (not recommended).
 
 ### Gradle
