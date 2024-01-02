@@ -38,7 +38,7 @@ public abstract class Event {
 	 * @see EventManager#callEvent(Event)
 	 */
 	public boolean callEvent() {
-		return JEvent.MANAGER.callEvent(this);
+		return JEvent.DEFAULT_MANAGER.callEvent(this);
 	}
 
 	/**

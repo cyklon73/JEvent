@@ -11,14 +11,23 @@ import java.util.Collection;
  * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 public final class JEvent implements EventManager {
-	static final EventManager MANAGER = new JEvent();
+	static final EventManager DEFAULT_MANAGER = new JEvent();
 
 	/**
-	 * @return The EventManager instance
+	 * @return The Default EventManager instance
 	 */
 	@NotNull
-	public static EventManager getManager() {
-		return MANAGER;
+	public static EventManager getDefaultManager() {
+		return DEFAULT_MANAGER;
+	}
+
+	/**
+	 * create a new EventManager
+	 * @return the new Created Manager
+	 */
+	@NotNull
+	public static EventManager createManager() {
+		return new JEvent();
 	}
 
 	private final Collection<Handler> handlers = new ArrayList<>();
