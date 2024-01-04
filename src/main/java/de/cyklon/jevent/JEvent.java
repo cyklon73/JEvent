@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * JEvent provides a powerful and lightweight event system based on the syntax of the <a href="https://www.spigotmc.org/wiki/using-the-event-api/">Spigot event</a> system
@@ -30,26 +31,33 @@ public final class JEvent implements EventManager {
 		return new JEvent();
 	}
 
-	private final Collection<Handler> handlers = new ArrayList<>();
+	private final Collection<Handler<?>> handlers = new ArrayList<>();
 
 	private JEvent() {}
 
 	@NotNull
-	private Collection<Handler> getHandlers(@NotNull Class<? extends Event> event) {
+	@SuppressWarnings("unchecked")
+	private <T extends Event> Collection<Handler<T>> getHandlers(@NotNull Class<T> event) {
 		return handlers.stream()
 				.filter(h -> h.isSuitableHandler(event))
+				.map(h -> (Handler<T>) h)
 				.sorted()
 				.toList();
 	}
 
 	@Override
 	public void registerListener(@NotNull Object obj) {
-		handlers.addAll(Handler.getHandlers(obj));
+		handlers.addAll(MethodHandler.getHandlers(obj));
+	}
+
+	@Override
+	public <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority, boolean ignoreCancelled) {
+		handlers.add(new RawHandler<>(event, handler, priority, ignoreCancelled));
 	}
 
 	@Override
 	public void unregisterListener(@NotNull Class<?> clazz) {
-		handlers.removeIf(h -> h.getListener().getClass().isInstance(clazz));
+		handlers.removeIf(h -> h instanceof MethodHandler mh && mh.getListener().getClass().isInstance(clazz));
 	}
 
 	@Override
