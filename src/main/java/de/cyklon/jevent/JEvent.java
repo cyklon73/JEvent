@@ -1,7 +1,9 @@
 package de.cyklon.jevent;
 
 import org.jetbrains.annotations.NotNull;
+import org.reflections.Reflections;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -48,6 +50,20 @@ public final class JEvent implements EventManager {
 	@Override
 	public void registerListener(@NotNull Object obj) {
 		handlers.addAll(MethodHandler.getHandlers(obj));
+	}
+
+	@Override
+	public void registerListener(@NotNull Class<?> clazz) {
+		try {
+			registerListener(clazz.getConstructor().newInstance());
+		} catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void registerListenerPackage(String packageName) {
+		new Reflections(packageName).getTypesAnnotatedWith(Listener.class).forEach(this::registerListener);
 	}
 
 	@Override
