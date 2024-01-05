@@ -10,12 +10,31 @@ import java.util.function.Consumer;
  * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 public sealed interface EventManager permits JEvent {
+
 	/**
 	 * registers all {@link MethodHandler EventHandlers} in the listener Class
 	 *
 	 * @param obj the object from which events are to be registered
 	 */
 	void registerListener(@NotNull Object obj);
+
+
+	/**
+	 * registers all {@link MethodHandler EventHandlers} in the listener Class
+	 * <p>
+	 * The class must have a no args constructor.
+	 * @param clazz the class from which events are to be registered
+	 */
+	void registerListener(@NotNull Class<?> clazz);
+
+	/**
+	 * registers a package as Listener package.
+	 * <p>
+	 * In a listener package, every class that is annotated with {@link Listener} is registered as a listener
+	 *
+	 * @param packageName the name of the package to be registered as a listener package
+	 */
+	void registerListenerPackage(String packageName);
 
 	/**
 	 * registers a listener for a specific event, with a consumer instead of a method
