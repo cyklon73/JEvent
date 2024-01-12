@@ -69,7 +69,7 @@ public final class JEvent implements EventManager {
 	public void registerListenerPackage(String packageName) {
 		ReflectPackage pkg = ReflectPackage.get(packageName);
 		pkg.getClasses(Filter.hasAnnotation(Listener.class)).forEach(this::registerListener);
-		pkg.getPackages(Filter.hasAnnotation(Listener.class)).stream()
+		pkg.getPackages(Filter.isLoaded().and(Filter.hasAnnotation(Listener.class))).stream()
 				.flatMap(p -> p.getClasses().stream())
 				.filter(Filter.hasAnnotation(Listener.class)::filterInverted)
 				.map(ReflectClass::newInstance)
