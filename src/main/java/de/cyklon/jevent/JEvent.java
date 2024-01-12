@@ -1,5 +1,6 @@
 package de.cyklon.jevent;
 
+import de.cyklon.reflection.entities.ReflectClass;
 import de.cyklon.reflection.entities.ReflectPackage;
 import de.cyklon.reflection.function.Filter;
 import org.jetbrains.annotations.NotNull;
@@ -7,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -69,6 +72,7 @@ public final class JEvent implements EventManager {
 		pkg.getPackages(Filter.hasAnnotation(Listener.class)).stream()
 				.flatMap(p -> p.getClasses().stream())
 				.filter(Filter.hasAnnotation(Listener.class)::filterInverted)
+				.map(ReflectClass::newInstance)
 				.forEach(this::registerListener);
 	}
 
