@@ -1,6 +1,7 @@
 package de.cyklon.jevent;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -101,4 +102,31 @@ public sealed interface EventManager permits JEvent {
 	 * @return Whether the event was canceled
 	 */
 	boolean callEvent(@NotNull Event event);
+
+	/**
+	 * registers the given instance as a Parameter instance to the key
+	 * <p>
+	 * Parameter instances can be used to add custom parameters to events and to instantiate classes that use parameter instances as parameters
+	 *
+	 * @param key the key of the instance
+	 * @param instance the parameter instance
+	 */
+	void registerParameterInstance(String key, @Nullable Object instance);
+
+
+	/**
+	 * remove the parameter instance registered to the given key
+	 * @param key the key of the instance
+	 * @return the instance registered to this key, or null if no instance is registered to this key
+	 */
+	@Nullable
+	Object removeParameterInstance(String key);
+
+	/**
+	 * returns the parameter instance registered to the given key
+	 * @param key the key of the instance
+	 * @return the value or null if there is no instance for this key, or the value is set to null
+	 */
+	@Nullable
+	Object getParameterInstance(String key);
 }

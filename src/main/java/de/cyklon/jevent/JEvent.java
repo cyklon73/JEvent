@@ -4,6 +4,7 @@ import de.cyklon.reflection.entities.ReflectClass;
 import de.cyklon.reflection.entities.ReflectPackage;
 import de.cyklon.reflection.function.Filter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public final class JEvent implements EventManager {
 	}
 
 	private final Collection<Handler<?>> handlers = new ArrayList<>();
+	private final Map<String, Object> parameterInstances = new HashMap<>();
 
 	private JEvent() {}
 
@@ -68,7 +70,9 @@ public final class JEvent implements EventManager {
 	@Override
 	public void registerListenerPackage(String packageName) {
 		ReflectPackage pkg = ReflectPackage.get(packageName);
-		pkg.getClasses(Filter.hasAnnotation(Listener.class)).forEach(this::registerListener);
+		pkg.getClasses(Filter.hasAnnotation(Listener.class)).stream()
+				.map(ReflectClass::newInstance)
+				.forEach(this::registerListener);
 		pkg.getPackages(Filter.isLoaded().and(Filter.hasAnnotation(Listener.class))).stream()
 				.flatMap(p -> p.getClasses().stream())
 				.filter(Filter.hasAnnotation(Listener.class)::filterInverted)
@@ -95,5 +99,20 @@ public final class JEvent implements EventManager {
 	public boolean callEvent(@NotNull Event event) {
 		getHandlers(event.getClass()).forEach(h -> h.invoke(event));
 		return event instanceof Cancellable ce && ce.isCancelled();
+	}
+
+	@Override
+	public void registerParameterInstance(String key, Object instance) {
+		parameterInstances.put(key, instance);
+	}
+
+	@Override
+	public @Nullable Object removeParameterInstance(String key) {
+		return parameterInstances.remove(key);
+	}
+
+	@Override
+	public @Nullable Object getParameterInstance(String key) {
+		return parameterInstances.get(key);
 	}
 }
