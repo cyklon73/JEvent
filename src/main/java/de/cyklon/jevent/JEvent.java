@@ -6,7 +6,6 @@ import de.cyklon.reflection.function.Filter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -60,11 +59,7 @@ public final class JEvent implements EventManager {
 
 	@Override
 	public void registerListener(@NotNull Class<?> clazz) {
-		try {
-			registerListener(clazz.getConstructor().newInstance());
-		} catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
+		registerListener(ReflectClass.wrap(clazz).newInstance());
 	}
 
 	@Override
