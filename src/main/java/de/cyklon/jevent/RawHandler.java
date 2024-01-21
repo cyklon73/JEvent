@@ -1,5 +1,7 @@
 package de.cyklon.jevent;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Consumer;
 
 
@@ -18,7 +20,7 @@ class RawHandler<T extends Event> extends Handler<T> {
     }
 
     @Override
-    protected void invokeEvent(T event) {
+    protected void invokeEvent(@NotNull EventManager manager, @NotNull T event) {
         consumer.accept(event);
     }
 }
