@@ -1,12 +1,12 @@
 package de.cyklon.jevent;
 
+import de.cyklon.reflection.entities.ReflectClass;
+import de.cyklon.reflection.entities.members.ReflectMethod;
+import de.cyklon.reflection.entities.members.ReflectParameter;
+import de.cyklon.reflection.function.Filter;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The MethodHandler object represents a single event handler method
@@ -16,25 +16,40 @@ import java.util.List;
  *
  * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
-class MethodHandler extends Handler<Event> {
-	private final Object listener;
-	private final Method handler;
+class MethodHandler<D> extends Handler<Event> {
+	private final D listener;
+	private final ReflectMethod<D, ?> handler;
+	private final String[] parameterInstances;
+	private final int eventIndex;
 
 	@SuppressWarnings("unchecked")
-	private MethodHandler(@NotNull Object listener, @NotNull Method handler, byte priority, boolean ignoreCancelled) {
+	private MethodHandler(@NotNull D listener, @NotNull ReflectMethod<D, ?> handler, byte priority, boolean ignoreCancelled) {
 		super(null, priority, ignoreCancelled);
 		this.listener = listener;
 		this.handler = handler;
-		this.handler.setAccessible(true);
 
-		for(Class<?> parameterType : handler.getParameterTypes()) {
-			if(Event.class.isAssignableFrom(parameterType)) {
-				this.eventType = (Class<? extends Event>) parameterType;
-				break;
+		List<String> pInstances = new ArrayList<>();
+		int eventIndex = -1;
+		List<? extends ReflectParameter<D, ?>> parameters = handler.getParameters();
+		for(int i = 0; i < parameters.size(); i++) {
+			ReflectParameter<D, ?> parameter = parameters.get(i);
+			Class<?> c = parameter.getReturnType().getInternal();
+			if(eventIndex==-1 && c!=null && Event.class.isAssignableFrom(c)) {
+				this.eventType = (Class<? extends Event>) c;
+				eventIndex = i;
+			} else {
+				ParameterInstance pi = parameter.getAnnotation(ParameterInstance.class);
+				if (pi==null) {
+					if (EventManager.class.equals(parameter.getReturnType().getInternal())) pInstances.add(null);
+					else throw new EventException("the method can only have one event as a parameter, the EventManager and parameterInstances");
+				}
+				else pInstances.add(pi.value());
 			}
 		}
+		if(eventIndex==-1) throw new EventException("the method must have an event as a parameter!");
 
-		if(eventType == null) throw new EventException("the method must have an event as a parameter!");
+		this.eventIndex = eventIndex;
+		this.parameterInstances = pInstances.toArray(String[]::new);
 	}
 
 	@NotNull
@@ -43,24 +58,26 @@ class MethodHandler extends Handler<Event> {
 	}
 
 	@Override
-	protected void invokeEvent(Event event) {
-		try {
-			handler.invoke(listener, event);
-		} catch(IllegalAccessException | InvocationTargetException e) {
-			throw new EventException(e);
+	protected void invokeEvent(@NotNull EventManager manager, @NotNull Event event) {
+		Object[] params = new Object[parameterInstances.length+1];
+		for (int i = 0; i < params.length; i++) {
+			int i1 = i;
+			if (i>=eventIndex) i1--;
+			params[i] = i==eventIndex ? event : parameterInstances[i1]==null ? manager : manager.getParameterInstance(parameterInstances[i1]);
 		}
+		handler.invoke(listener, params);
 	}
 
 	@NotNull
-	public static Collection<MethodHandler> getHandlers(@NotNull Object listener) {
-		Method[] methods = listener.getClass().getDeclaredMethods();
-		List<MethodHandler> handlers = new LinkedList<>();
+	public static <D> Collection<MethodHandler<?>> getHandlers(@NotNull D listener) {
+		Set<? extends ReflectMethod<D, ?>> methods = ReflectClass.getClass(listener).getMethods(Filter.all());
+		List<MethodHandler<?>> handlers = new LinkedList<>();
 
-		for(Method handler : methods) {
+		for(ReflectMethod<D, ?> handler : methods) {
 			EventHandler annotation = handler.getAnnotation(EventHandler.class);
 			if(annotation == null) continue;
 
-			handlers.add(new MethodHandler(listener, handler, annotation.priority(), annotation.ignoreCancelled()));
+			handlers.add(new MethodHandler<>(listener, handler, annotation.priority(), annotation.ignoreCancelled()));
 		}
 
 		return handlers;
