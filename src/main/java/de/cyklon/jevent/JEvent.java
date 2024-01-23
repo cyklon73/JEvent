@@ -88,7 +88,7 @@ public final class JEvent implements EventManager {
 					else obj = internal==null ? null : internal.cast(null);
 					params[i] = obj;
 				}
-				con.newInstance(params);
+				instance = con.newInstance(params);
 			}
 		}
 
