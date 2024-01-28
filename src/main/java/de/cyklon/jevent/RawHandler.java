@@ -14,7 +14,7 @@ class RawHandler<T extends Event> extends Handler<T> {
 
 	private final Consumer<T> consumer;
 
-	public RawHandler(Class<T> eventType, Consumer<T> consumer, byte priority, boolean ignoreCancelled) {
+	public RawHandler(@NotNull Class<T> eventType, @NotNull Consumer<T> consumer, byte priority, boolean ignoreCancelled) {
 		super(eventType, priority, ignoreCancelled);
 		this.consumer = consumer;
 	}

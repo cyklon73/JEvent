@@ -85,7 +85,7 @@ public final class JEvent implements EventManager {
 	}
 
 	@Override
-	public void registerListenerPackage(String packageName) {
+	public void registerListenerPackage(@NotNull String packageName) {
 		ReflectPackage pkg = ReflectPackage.get(packageName);
 
 		pkg.getClasses(Filter.hasAnnotation(Listener.class)).forEach(this::registerListener);
@@ -97,7 +97,7 @@ public final class JEvent implements EventManager {
 	}
 
 	@Override
-	public <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority, boolean ignoreCancelled) {
+	public <T extends Event> void registerHandler(@NotNull Class<T> event, @NotNull Consumer<T> handler, byte priority, boolean ignoreCancelled) {
 		handlers.add(new RawHandler<>(event, handler, priority, ignoreCancelled));
 	}
 
@@ -119,17 +119,17 @@ public final class JEvent implements EventManager {
 	}
 
 	@Override
-	public void registerParameterInstance(@NotNull String key, Object instance) {
+	public void registerParameterInstance(@NotNull String key, @Nullable Object instance) {
 		parameterInstances.put(key, instance);
 	}
 
 	@Override
-	public @Nullable Object removeParameterInstance(String key) {
+	public @Nullable Object removeParameterInstance(@NotNull String key) {
 		return parameterInstances.remove(key);
 	}
 
 	@Override
-	public @Nullable Object getParameterInstance(String key) {
+	public @Nullable Object getParameterInstance(@NotNull String key) {
 		return parameterInstances.get(key);
 	}
 }
