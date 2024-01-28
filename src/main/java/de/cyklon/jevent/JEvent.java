@@ -70,6 +70,7 @@ public final class JEvent implements EventManager {
 				.map(constructor -> {
 					List<? extends ReflectParameter<D, ?>> parameters = constructor.getParameters();
 					Object[] params = new Object[parameters.size()];
+
 					for(int i = 0; i < parameters.size(); i++) {
 						ReflectParameter<D, ?> param = parameters.get(i);
 						Class<?> internal = param.getReturnType().getInternal();
@@ -81,7 +82,7 @@ public final class JEvent implements EventManager {
 					}
 					return constructor.newInstance(params);
 				})
-				.ifPresentOrElse(this::registerListener, () -> { throw new IllegalArgumentException("Couldn't instantiate " + clazz); });
+				.ifPresentOrElse(this::registerListener, () -> {throw new IllegalArgumentException("Couldn't instantiate " + clazz);});
 	}
 
 	@Override
