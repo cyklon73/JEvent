@@ -60,7 +60,7 @@ static String getCommit() {
     try {
         var commit = 'git rev-parse --verify --short HEAD'.execute().text.trim()
         return commit.isEmpty() ? 'unknown' : commit
-    } catch (IOException e) {
+    } catch(IOException e) {
         throw new RuntimeException(e)
     }
 }
