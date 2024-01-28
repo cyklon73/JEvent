@@ -12,15 +12,15 @@ import java.util.function.Consumer;
  */
 class RawHandler<T extends Event> extends Handler<T> {
 
-    private final Consumer<T> consumer;
+	private final Consumer<T> consumer;
 
-    public RawHandler(Class<T> eventType, Consumer<T> consumer, byte priority, boolean ignoreCancelled) {
-        super(eventType, priority, ignoreCancelled);
-        this.consumer = consumer;
-    }
+	public RawHandler(Class<T> eventType, Consumer<T> consumer, byte priority, boolean ignoreCancelled) {
+		super(eventType, priority, ignoreCancelled);
+		this.consumer = consumer;
+	}
 
-    @Override
-    protected void invokeEvent(@NotNull EventManager manager, @NotNull T event) {
-        consumer.accept(event);
-    }
+	@Override
+	protected void invokeEvent(@NotNull EventManager manager, @NotNull T event) {
+		consumer.accept(event);
+	}
 }

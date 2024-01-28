@@ -29,6 +29,7 @@ public final class JEvent implements EventManager {
 
 	/**
 	 * create a new EventManager
+	 *
 	 * @return the new Created Manager
 	 */
 	@NotNull
@@ -61,38 +62,26 @@ public final class JEvent implements EventManager {
 		registerListener(ReflectClass.wrap(clazz));
 	}
 
+	@SuppressWarnings("unchecked")
 	private <D> void registerListener(@NotNull ReflectClass<D> clazz) {
-		Optional<? extends ReflectConstructor<D>> constructor = clazz.getConstructors(Filter.hasNoArgs()).stream().findFirst();
-		D instance = null;
-		if (constructor.isPresent()) instance = constructor.get().newInstance();
-		else {
-			constructor = clazz.getConstructors(c -> {
-				List<? extends ReflectParameter<?, ?>> parameters = c.getParameters();
-				for (ReflectParameter<?, ?> parameter : parameters) {
-					if (!parameter.hasAnnotation(ParameterInstance.class)) return false;
-				}
-				return true;
-			}).stream().findFirst();
-			if (constructor.isEmpty()) constructor = clazz.getConstructors(Filter.all()).stream().findFirst();
-			if (constructor.isPresent()) {
-				ReflectConstructor<D> con = constructor.get();
-				List<? extends ReflectParameter<D, ?>> parameters = con.getParameters();
-				Object[] params = new Object[parameters.size()];
-				for (int i = 0; i < parameters.size(); i++) {
-					ReflectParameter<D, ?> param = parameters.get(i);
-					Class<?> internal = param.getReturnType().getInternal();
-					Object obj;
-					ParameterInstance pi;
-					if (EventManager.class.equals(internal)) obj = this;
-					else if ((pi = param.getAnnotation(ParameterInstance.class)) != null) obj = getParameterInstance(pi.value());
-					else obj = getParameterInstance(internal.getName());
-					params[i] = obj;
-				}
-				instance = con.newInstance(params);
-			}
-		}
+		((Optional<ReflectConstructor<D>>) clazz.getConstructors(Filter.hasNoArgs()).stream().findFirst())
+				.or(() -> clazz.getConstructors(c -> c.getParameters().stream().allMatch(p -> p.hasAnnotation(ParameterInstance.class))).stream().findFirst())
+				.or(() -> clazz.getConstructors(Filter.all()).stream().findFirst())
+				.map(constructor -> {
+					List<? extends ReflectParameter<D, ?>> parameters = constructor.getParameters();
+					Object[] params = new Object[parameters.size()];
+					for(int i = 0; i < parameters.size(); i++) {
+						ReflectParameter<D, ?> param = parameters.get(i);
+						Class<?> internal = param.getReturnType().getInternal();
+						ParameterInstance pi = param.getAnnotation(ParameterInstance.class);
 
-		if (instance!=null) registerListener(instance);
+						if(EventManager.class.equals(internal)) params[i] = this;
+						else if(pi != null) params[i] = getParameterInstance(pi.value());
+						else params[i] = getParameterInstance(internal.getName());
+					}
+					return constructor.newInstance(params);
+				})
+				.ifPresentOrElse(this::registerListener, () -> { throw new IllegalArgumentException("Couldn't instantiate " + clazz); });
 	}
 
 	@Override

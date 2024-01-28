@@ -28,25 +28,27 @@ class MethodHandler<D> extends Handler<Event> {
 		this.listener = listener;
 		this.handler = handler;
 
-		List<String> pInstances = new ArrayList<>();
 		int eventIndex = -1;
+		List<String> pInstances = new ArrayList<>();
 		List<? extends ReflectParameter<D, ?>> parameters = handler.getParameters();
+
 		for(int i = 0; i < parameters.size(); i++) {
 			ReflectParameter<D, ?> parameter = parameters.get(i);
 			Class<?> c = parameter.getReturnType().getInternal();
-			if(eventIndex==-1 && Event.class.isAssignableFrom(c)) {
+
+			if(eventIndex == -1 && Event.class.isAssignableFrom(c)) {
 				this.eventType = (Class<? extends Event>) c;
 				eventIndex = i;
 			} else {
 				ParameterInstance pi = parameter.getAnnotation(ParameterInstance.class);
-				if (pi==null) {
-					if (EventManager.class.equals(c)) pInstances.add(null);
+				if(pi == null) {
+					if(EventManager.class.equals(c)) pInstances.add(null);
 					else pInstances.add(c.getName());
-				}
-				else pInstances.add(pi.value());
+				} else pInstances.add(pi.value());
 			}
 		}
-		if(eventIndex==-1) throw new EventException("the method must have an event as a parameter!");
+
+		if(eventIndex == -1) throw new EventException("The method must have an event as a parameter!");
 
 		this.eventIndex = eventIndex;
 		this.parameterInstances = pInstances.toArray(String[]::new);
@@ -59,12 +61,17 @@ class MethodHandler<D> extends Handler<Event> {
 
 	@Override
 	protected void invokeEvent(@NotNull EventManager manager, @NotNull Event event) {
-		Object[] params = new Object[parameterInstances.length+1];
-		for (int i = 0; i < params.length; i++) {
-			int i1 = i;
-			if (i>=eventIndex) i1--;
-			params[i] = i==eventIndex ? event : parameterInstances[i1]==null ? manager : manager.getParameterInstance(parameterInstances[i1]);
+		Object[] params = new Object[parameterInstances.length + 1];
+
+		for(int i = 0; i < params.length; i++) {
+			int j = Math.min(i, eventIndex);
+			params[i] = i == eventIndex
+					? event
+					: parameterInstances[j] == null
+					? manager
+					: manager.getParameterInstance(parameterInstances[j]);
 		}
+
 		handler.invoke(listener, params);
 	}
 

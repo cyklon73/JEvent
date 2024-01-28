@@ -24,6 +24,7 @@ public sealed interface EventManager permits JEvent {
 	 * registers all {@link MethodHandler EventHandlers} in the listener Class
 	 * <p>
 	 * The class must have a no args constructor.
+	 *
 	 * @param clazz the class from which events are to be registered
 	 */
 	void registerListener(@NotNull Class<?> clazz);
@@ -40,21 +41,21 @@ public sealed interface EventManager permits JEvent {
 	/**
 	 * registers a listener for a specific event, with a consumer instead of a method
 	 *
-	 * @param event the event for which the listener is to be registered
-	 * @param handler The consumer to be executed when the event is called
-	 * @param priority the event {@link EventHandler#priority() priority}
+	 * @param event           the event for which the listener is to be registered
+	 * @param handler         The consumer to be executed when the event is called
+	 * @param priority        the event {@link EventHandler#priority() priority}
 	 * @param ignoreCancelled if true, the handler is not called for {@link EventHandler#ignoreCancelled() canceled events}
-	 * @param <T> the event type
+	 * @param <T>             the event type
 	 */
 	<T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority, boolean ignoreCancelled);
 
 	/**
 	 * registers a listener for a specific event, with a consumer instead of a method
 	 *
-	 * @param event the event for which the listener is to be registered
-	 * @param handler The consumer to be executed when the event is called
+	 * @param event    the event for which the listener is to be registered
+	 * @param handler  The consumer to be executed when the event is called
 	 * @param priority the event {@link EventHandler#priority() priority}
-	 * @param <T> the event type
+	 * @param <T>      the event type
 	 */
 	default <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority) {
 		registerHandler(event, handler, priority, false);
@@ -63,10 +64,10 @@ public sealed interface EventManager permits JEvent {
 	/**
 	 * registers a listener for a specific event, with a consumer instead of a method
 	 *
-	 * @param event the event for which the listener is to be registered
-	 * @param handler The consumer to be executed when the event is called
+	 * @param event           the event for which the listener is to be registered
+	 * @param handler         The consumer to be executed when the event is called
 	 * @param ignoreCancelled if true, the handler is not called for {@link EventHandler#ignoreCancelled() canceled events}
-	 * @param <T> the event type
+	 * @param <T>             the event type
 	 */
 	default <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, boolean ignoreCancelled) {
 		registerHandler(event, handler, EventHandler.NORMAL, ignoreCancelled);
@@ -75,9 +76,9 @@ public sealed interface EventManager permits JEvent {
 	/**
 	 * registers a listener for a specific event, with a consumer instead of a method
 	 *
-	 * @param event the event for which the listener is to be registered
+	 * @param event   the event for which the listener is to be registered
 	 * @param handler The consumer to be executed when the event is called
-	 * @param <T> the event type
+	 * @param <T>     the event type
 	 */
 	default <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler) {
 		registerHandler(event, handler, EventHandler.NORMAL, false);
@@ -108,7 +109,7 @@ public sealed interface EventManager permits JEvent {
 	 * <p>
 	 * Parameter instances can be used to add custom parameters to events and to instantiate classes that use parameter instances as parameters
 	 *
-	 * @param key the key of the instance
+	 * @param key      the key of the instance
 	 * @param instance the parameter instance
 	 */
 	void registerParameterInstance(@NotNull String key, @Nullable Object instance);
@@ -118,7 +119,7 @@ public sealed interface EventManager permits JEvent {
 	 * <p>
 	 * Parameter instances can be used to add custom parameters to events and to instantiate classes that use parameter instances as parameters
 	 *
-	 * @param type the type to register the instance
+	 * @param type     the type to register the instance
 	 * @param instance the parameter instance
 	 */
 	default <T> void registerParameterInstance(@NotNull Class<? extends T> type, @Nullable T instance) {
@@ -139,6 +140,7 @@ public sealed interface EventManager permits JEvent {
 
 	/**
 	 * remove the parameter instance registered to the given key
+	 *
 	 * @param key the key of the instance
 	 * @return the instance registered to this key, or null if no instance is registered to this key
 	 */
@@ -147,6 +149,7 @@ public sealed interface EventManager permits JEvent {
 
 	/**
 	 * returns the parameter instance registered to the given key
+	 *
 	 * @param key the key of the instance
 	 * @return the value or null if there is no instance for this key, or the value is set to null
 	 */
