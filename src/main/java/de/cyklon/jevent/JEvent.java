@@ -85,7 +85,7 @@ public final class JEvent implements EventManager {
 					ParameterInstance pi;
 					if (EventManager.class.equals(internal)) obj = this;
 					else if ((pi = param.getAnnotation(ParameterInstance.class)) != null) obj = getParameterInstance(pi.value());
-					else obj = internal==null ? null : internal.cast(null);
+					else obj = getParameterInstance(internal.getName());
 					params[i] = obj;
 				}
 				instance = con.newInstance(params);
@@ -130,7 +130,7 @@ public final class JEvent implements EventManager {
 	}
 
 	@Override
-	public void registerParameterInstance(String key, Object instance) {
+	public void registerParameterInstance(@NotNull String key, Object instance) {
 		parameterInstances.put(key, instance);
 	}
 

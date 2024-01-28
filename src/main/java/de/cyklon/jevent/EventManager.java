@@ -111,7 +111,30 @@ public sealed interface EventManager permits JEvent {
 	 * @param key the key of the instance
 	 * @param instance the parameter instance
 	 */
-	void registerParameterInstance(String key, @Nullable Object instance);
+	void registerParameterInstance(@NotNull String key, @Nullable Object instance);
+
+	/**
+	 * registers the given instance as a Parameter instance to the given type
+	 * <p>
+	 * Parameter instances can be used to add custom parameters to events and to instantiate classes that use parameter instances as parameters
+	 *
+	 * @param type the type to register the instance
+	 * @param instance the parameter instance
+	 */
+	default <T> void registerParameterInstance(@NotNull Class<? extends T> type, @Nullable T instance) {
+		registerParameterInstance(type.getName(), instance);
+	}
+
+	/**
+	 * registers the given instance as a Parameter instance to the type of the instance
+	 * <p>
+	 * Parameter instances can be used to add custom parameters to events and to instantiate classes that use parameter instances as parameters
+	 *
+	 * @param instance the parameter instance
+	 */
+	default void registerParameterInstance(@NotNull Object instance) {
+		registerParameterInstance(instance.getClass(), instance);
+	}
 
 
 	/**

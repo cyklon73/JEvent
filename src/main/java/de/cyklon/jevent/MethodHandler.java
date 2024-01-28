@@ -34,14 +34,14 @@ class MethodHandler<D> extends Handler<Event> {
 		for(int i = 0; i < parameters.size(); i++) {
 			ReflectParameter<D, ?> parameter = parameters.get(i);
 			Class<?> c = parameter.getReturnType().getInternal();
-			if(eventIndex==-1 && c!=null && Event.class.isAssignableFrom(c)) {
+			if(eventIndex==-1 && Event.class.isAssignableFrom(c)) {
 				this.eventType = (Class<? extends Event>) c;
 				eventIndex = i;
 			} else {
 				ParameterInstance pi = parameter.getAnnotation(ParameterInstance.class);
 				if (pi==null) {
-					if (EventManager.class.equals(parameter.getReturnType().getInternal())) pInstances.add(null);
-					else throw new EventException("the method can only have one event as a parameter, the EventManager and parameterInstances");
+					if (EventManager.class.equals(c)) pInstances.add(null);
+					else pInstances.add(c.getName());
 				}
 				else pInstances.add(pi.value());
 			}
