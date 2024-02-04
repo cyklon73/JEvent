@@ -83,18 +83,9 @@ public final class JEvent implements EventManager {
 					Class<?> internal = param.getReturnType().getInternal();
 					Object obj;
 					ParameterInstance pi;
-					if (EventManager.class.equals(internal)) {
-						obj = this;
-						System.out.println("put constructor parameter EventManager");
-					}
-					else if ((pi = param.getAnnotation(ParameterInstance.class)) != null) {
-						obj = getParameterInstance(pi.value());
-						System.out.println("put constructor parameter with ParameterInstance value");
-					}
-					else {
-						obj = getParameterInstance(internal.getName());
-						System.out.printf("put constructor parameter with class name (%s)", internal.getName());
-					}
+					if (EventManager.class.equals(internal)) obj = this;
+					else if ((pi = param.getAnnotation(ParameterInstance.class)) != null) obj = getParameterInstance(pi.value());
+					else obj = getParameterInstance(internal.getName());
 					params[i] = obj;
 				}
 				instance = con.newInstance(params);
@@ -140,7 +131,6 @@ public final class JEvent implements EventManager {
 
 	@Override
 	public void registerParameterInstance(@NotNull String key, Object instance) {
-		System.out.printf("register instance with key '%s' for instance '%s'%n", key, instance);
 		parameterInstances.put(key, instance);
 	}
 
@@ -151,7 +141,6 @@ public final class JEvent implements EventManager {
 
 	@Override
 	public @Nullable Object getParameterInstance(String key) {
-		System.out.printf("get parameter instance with key '%s', with result '%s'", key, parameterInstances.get(key));
 		return parameterInstances.get(key);
 	}
 }
