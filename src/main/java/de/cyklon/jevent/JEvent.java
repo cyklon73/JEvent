@@ -38,6 +38,7 @@ public final class JEvent implements EventManager {
 
 	private final Collection<Handler<?>> handlers = new HashSet<>();
 	private final Map<String, Object> parameterInstances = new HashMap<>();
+	private Consumer<String> logger = null;
 
 	private JEvent() {}
 
@@ -53,7 +54,13 @@ public final class JEvent implements EventManager {
 
 	@Override
 	public void registerListener(@NotNull Object obj) {
-		handlers.addAll(MethodHandler.getHandlers(obj));
+		debug("register listener " + obj.getClass());
+		Collection<MethodHandler<?>> handlers = MethodHandler.getHandlers(obj);
+		this.handlers.addAll(handlers);
+		if (isDebugEnabled()) {
+			debug(String.format("%s handlers registered for listener %s:", handlers.size(), obj.getClass()));
+			handlers.forEach(this::debug);
+		}
 	}
 
 	@Override
@@ -67,9 +74,13 @@ public final class JEvent implements EventManager {
 	}
 
 	private <D> void registerListener0(@NotNull ReflectClass<D> clazz) {
+		debug("search for suitable constructor in " + clazz);
 		Optional<? extends ReflectConstructor<D>> constructor = clazz.getConstructors(Filter.hasNoArgs()).stream().min(Sorter.byModifier());
 		D instance = null;
-		if (constructor.isPresent()) instance = constructor.get().newInstance();
+		if (constructor.isPresent()) {
+			debug("constructor found: " + constructor.get());
+			instance = constructor.get().newInstance();
+		}
 		else {
 			constructor = clazz.getConstructors(c -> {
 				List<? extends ReflectParameter<?, ?>> parameters = c.getParameters();
@@ -80,6 +91,7 @@ public final class JEvent implements EventManager {
 			}).stream().findFirst();
 			if (constructor.isEmpty()) constructor = clazz.getConstructors(Filter.all()).stream().findFirst();
 			if (constructor.isPresent()) {
+				debug("constructor found: " + constructor.get());
 				ReflectConstructor<D> con = constructor.get();
 				List<? extends ReflectParameter<D, ?>> parameters = con.getParameters();
 				Object[] params = new Object[parameters.size()];
@@ -98,10 +110,12 @@ public final class JEvent implements EventManager {
 		}
 
 		if (instance!=null) registerListener(instance);
+		else debug("cannot register listener " + clazz);
 	}
 
 	@Override
 	public void registerListenerPackage(OfflinePackage pkg) {
+		debug("register listener package " + pkg);
 		ReflectPackage rp = load(pkg);
 		if (rp!=null) processPackage(rp);
 		getPackages(pkg).stream()
@@ -140,38 +154,62 @@ public final class JEvent implements EventManager {
 
 	@Override
 	public <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority, boolean ignoreCancelled) {
-		handlers.add(new RawHandler<>(event, handler, priority, ignoreCancelled));
+		RawHandler<T> rh = new RawHandler<>(event, handler, priority, ignoreCancelled);
+		debug("register handler " + rh);
+		handlers.add(rh);
 	}
 
 	@Override
 	@SuppressWarnings("rawtypes")
 	public void unregisterListener(@NotNull Class<?> clazz) {
-		handlers.removeIf(h -> h instanceof MethodHandler mh && mh.getListener().getClass().isInstance(clazz));
+		if (handlers.removeIf(h -> h instanceof MethodHandler mh && mh.getListener().getClass().isInstance(clazz))) debug("unregistered listener " + clazz);
+		else debug("listener not unregistered because no listener matches " + clazz);
 	}
 
 	@Override
 	public void unregisterAll() {
+		debug("unregister all handlers");
 		handlers.clear();
 	}
 
 	@Override
 	public boolean callEvent(@NotNull Event event) {
+		debug("call event " + event.getClass());
 		getHandlers(event.getClass()).forEach(h -> h.invoke(this, event));
 		return event instanceof Cancellable ce && ce.isCancelled();
 	}
 
 	@Override
 	public void registerParameterInstance(@NotNull String key, Object instance) {
+		debug("register parameter instance %s: %s".formatted(key, instance));
 		parameterInstances.put(key, instance);
 	}
 
 	@Override
 	public @Nullable Object removeParameterInstance(String key) {
+		debug("remove parameter instance " + key);
 		return parameterInstances.remove(key);
 	}
 
 	@Override
 	public @Nullable Object getParameterInstance(String key) {
 		return parameterInstances.get(key);
+	}
+
+	@Override
+	public void setDebugLogger(@Nullable Consumer<String> logger) {
+		this.logger = logger;
+	}
+
+	private boolean isDebugEnabled() {
+		return logger!=null;
+	}
+
+	private void debug(String msg) {
+		if (isDebugEnabled()) logger.accept(msg);
+	}
+
+	private void debug(Object obj) {
+		debug(obj.toString());
 	}
 }
