@@ -80,4 +80,14 @@ class MethodHandler<D> extends Handler<Event> {
 
 		return handlers;
 	}
+
+	@Override
+	public int hashCode() {
+		return handler.getMethod().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof MethodHandler<?> mh && mh.handler.equals(this.handler);
+	}
 }
