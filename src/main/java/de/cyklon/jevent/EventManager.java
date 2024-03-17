@@ -171,4 +171,27 @@ public sealed interface EventManager permits JEvent {
 	 */
 	@Nullable
 	Object getParameterInstance(String key);
+
+	/**
+	 * Sets a logger for debug prints
+	 * <p>
+	 * example for java.util.logging and SLF4J:
+	 * <pre>{@code
+	 *  public class Main {
+	 *
+	 *      public static void main(String[] args) {
+	 *          EventManager manager = JEvent.getDefaultManager();
+	 *
+	 *          //java.util.logging
+	 *          manager.setDebugLogger(msg -> logger.log(Level.FINE, msg));
+	 *
+	 *          //SLF4J
+	 *          manager.setDebugLogger(logger::debug);
+	 *      }
+	 *
+	 *  }
+	 * }</pre>
+	 * @param logger the consumer with the corresponding log method or null to disable debug messages
+	 */
+	void setDebugLogger(@Nullable Consumer<String> logger);
 }
