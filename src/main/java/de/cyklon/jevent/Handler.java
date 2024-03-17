@@ -35,12 +35,6 @@ abstract class Handler<T extends Event> implements Comparable<Handler<T>> {
 
     @Override
     public String toString() {
-        return """
-                %s {
-                    eventType: %s,
-                    priority: %s,
-                    ignoreCancelled: %s,
-                    handler: %s
-                """.formatted(getClass(), eventType, priority, ignoreCancelled, "%s");
+        return "%s {eventType: %s, priority: %s, ignoreCancelled: %s, handler: %s}".formatted(getClass(), eventType, priority, ignoreCancelled, "%s");
     }
 }
