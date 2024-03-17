@@ -1,5 +1,7 @@
 package de.cyklon.jevent;
 
+import de.cyklon.reflection.entities.OfflinePackage;
+import de.cyklon.reflection.entities.ReflectClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,13 +29,32 @@ public sealed interface EventManager permits JEvent {
 	void registerListener(@NotNull Class<?> clazz);
 
 	/**
+	 * registers all {@link MethodHandler EventHandlers} in the listener Class
+	 * <p>
+	 * The class must have a no args constructor.
+	 * @param clazz the class from which events are to be registered
+	 */
+	void registerListener(@NotNull ReflectClass<?> clazz);
+
+	/**
 	 * registers a package as Listener package.
 	 * <p>
 	 * In a listener package, every class that is annotated with {@link Listener} is registered as a listener
 	 *
 	 * @param packageName the name of the package to be registered as a listener package
 	 */
-	void registerListenerPackage(String packageName);
+	default void registerListenerPackage(String packageName) {
+		registerListenerPackage(OfflinePackage.get(packageName));
+	}
+
+	/**
+	 * registers a package as Listener package.
+	 * <p>
+	 * In a listener package, every class that is annotated with {@link Listener} is registered as a listener
+	 *
+	 * @param pkg the package
+	 */
+	void registerListenerPackage(OfflinePackage pkg);
 
 	/**
 	 * registers a listener for a specific event, with a consumer instead of a method
