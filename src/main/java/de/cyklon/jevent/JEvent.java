@@ -7,7 +7,6 @@ import de.cyklon.reflection.entities.members.ReflectConstructor;
 import de.cyklon.reflection.entities.members.ReflectParameter;
 import de.cyklon.reflection.function.Filter;
 import de.cyklon.reflection.function.Sorter;
-import de.cyklon.reflection.types.Modifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +36,7 @@ public final class JEvent implements EventManager {
 		return new JEvent();
 	}
 
-	private final Collection<Handler<?>> handlers = new ArrayList<>();
+	private final Collection<Handler<?>> handlers = new HashSet<>();
 	private final Map<String, Object> parameterInstances = new HashMap<>();
 
 	private JEvent() {}
