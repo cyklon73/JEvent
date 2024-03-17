@@ -135,10 +135,7 @@ public final class JEvent implements EventManager {
 	private Set<ReflectPackage> getPackages(OfflinePackage pkg) {
 		Set<ReflectPackage> result = new HashSet<>();
 		if (!pkg.getDirectClasses().isEmpty()) result.add(pkg.load());
-		pkg.getPackages().stream()
-				.filter(p -> !p.getDirectClasses().isEmpty())
-				.map(OfflinePackage::load)
-				.forEach(this::getPackages);
+		pkg.getPackages().forEach(p -> result.addAll(getPackages(p)));
 		return result;
 	}
 
