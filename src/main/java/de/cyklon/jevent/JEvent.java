@@ -1,10 +1,13 @@
 package de.cyklon.jevent;
 
+import de.cyklon.reflection.entities.OfflinePackage;
 import de.cyklon.reflection.entities.ReflectClass;
 import de.cyklon.reflection.entities.ReflectPackage;
 import de.cyklon.reflection.entities.members.ReflectConstructor;
 import de.cyklon.reflection.entities.members.ReflectParameter;
 import de.cyklon.reflection.function.Filter;
+import de.cyklon.reflection.function.Sorter;
+import de.cyklon.reflection.types.Modifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,11 +59,16 @@ public final class JEvent implements EventManager {
 
 	@Override
 	public void registerListener(@NotNull Class<?> clazz) {
-		registerListener(ReflectClass.wrap(clazz));
+		registerListener0(ReflectClass.wrap(clazz));
 	}
 
-	private <D> void registerListener(@NotNull ReflectClass<D> clazz) {
-		Optional<? extends ReflectConstructor<D>> constructor = clazz.getConstructors(Filter.hasNoArgs()).stream().findFirst();
+	@Override
+	public void registerListener(@NotNull ReflectClass<?> clazz) {
+		registerListener0(clazz);
+	}
+
+	private <D> void registerListener0(@NotNull ReflectClass<D> clazz) {
+		Optional<? extends ReflectConstructor<D>> constructor = clazz.getConstructors(Filter.hasNoArgs()).stream().min(Sorter.byModifier());
 		D instance = null;
 		if (constructor.isPresent()) instance = constructor.get().newInstance();
 		else {
@@ -94,15 +102,44 @@ public final class JEvent implements EventManager {
 	}
 
 	@Override
-	public void registerListenerPackage(String packageName) {
-		ReflectPackage pkg = ReflectPackage.get(packageName);
+	public void registerListenerPackage(OfflinePackage pkg) {
+		ReflectPackage rp = load(pkg);
+		if (rp!=null) processPackage(rp);
+		getPackages(pkg).stream()
+				.map(this::load)
+				.filter(Objects::nonNull)
+				.forEach(this::processPackage);
+	}
 
-		pkg.getClasses(Filter.hasAnnotation(Listener.class)).forEach(this::registerListener);
+	private void processPackage(ReflectPackage pkg) {
+		Listener listener;
+		if ((listener = pkg.getAnnotation(Listener.class)) != null) pkg.getLoadedClasses().forEach(c -> processClass(c, listener.includeSubclasses()));
+		else {
+			pkg.getLoadedClasses().stream()
+					.filter(c -> c.hasAnnotation(Listener.class))
+					.forEach(c -> processClass(c, false));
+		}
+	}
 
-		pkg.getPackages(Filter.isLoaded().and(Filter.hasAnnotation(Listener.class))).stream()
-				.flatMap(p -> p.getClasses().stream())
-				.filter(Filter.hasAnnotation(Listener.class)::filterInverted)
-				.forEach(this::registerListener);
+	private void processClass(ReflectClass<?> clazz, boolean includeSubclasses) {
+		registerListener0(clazz);
+		Listener listener;
+		if (includeSubclasses || (((listener = clazz.getAnnotation(Listener.class)) != null) && listener.includeSubclasses())) clazz.getSubclasses(Filter.all()).forEach(c -> processClass(c, true));
+	}
+
+	private ReflectPackage load(OfflinePackage pkg) {
+		if (pkg.getDirectClasses().isEmpty()) return null;
+		return pkg.load();
+	}
+
+	private Set<ReflectPackage> getPackages(OfflinePackage pkg) {
+		Set<ReflectPackage> result = new HashSet<>();
+		if (!pkg.getDirectClasses().isEmpty()) result.add(pkg.load());
+		pkg.getPackages().stream()
+				.filter(p -> !p.getDirectClasses().isEmpty())
+				.map(OfflinePackage::load)
+				.forEach(this::getPackages);
+		return result;
 	}
 
 	@Override
