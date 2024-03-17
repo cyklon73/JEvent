@@ -13,8 +13,6 @@ import java.util.*;
  * <p>
  * <h2 id="method-handler">What is a EventHandler?</h2>
  * An event handler method is a method that is annotated with the {@link EventHandler} annotation
- *
- * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 class MethodHandler<D> extends Handler<Event> {
 	private final D listener;

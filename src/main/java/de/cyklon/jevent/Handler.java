@@ -4,8 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * The Handler Object is the base class for any type of handler
- *
- * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 abstract class Handler<T extends Event> implements Comparable<Handler<T>> {
     protected Class<? extends Event> eventType;

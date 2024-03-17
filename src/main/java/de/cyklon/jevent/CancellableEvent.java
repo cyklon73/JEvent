@@ -7,30 +7,29 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Instead of
  * <pre>{@code
- * public class MyEvent extends Event implements Cancellable {
- *   private boolean cancelled = false;
+ *  public class MyEvent extends Event implements Cancellable {
  *
- *                @Override
- * 	public boolean isCancelled() {
- * 		return cancelled;
- * 	}
+ *      private boolean cancelled = false;
  *
- * 	@Override
- * 	public void setCancelled(boolean cancelled) {
- * 		this.cancelled = cancelled;
- * 	}
- * }
+ *      @Override
+ *      public boolean isCancelled() {
+ *          return cancelled;
+ *      }
+ *
+ *      @Override
+ *      public void setCancelled(boolean cancelled) {
+ *          this.cancelled = cancelled;
+ *      }
+ *  }
  * }</pre>
  *
  * do
  *
  * <pre>{@code
- * public class MyEvent extends CancellableEvent {
+ *  public class MyEvent extends CancellableEvent {
  *
- * }
+ *  }
  * }</pre>
- *
- * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 public abstract class CancellableEvent extends Event implements Cancellable {
 	private boolean cancelled = false;

@@ -6,8 +6,6 @@ import org.jetbrains.annotations.Nullable;
 /**
  * The event base class.
  * Extend this class to create your own event
- *
- * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 public abstract class Event {
 	/**

@@ -3,8 +3,6 @@ package de.cyklon.jevent;
 
 /**
  * is called when an error occurs in the event system
- *
- * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 public class EventException extends RuntimeException {
 	/**

@@ -7,8 +7,6 @@ import java.util.function.Consumer;
 
 /**
  * The EventManager to manage and execute events
- *
- * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 public sealed interface EventManager permits JEvent {
 

@@ -7,8 +7,6 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation to mark methods as being event handler methods
- *
- * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

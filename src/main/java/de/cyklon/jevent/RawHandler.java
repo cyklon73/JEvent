@@ -7,8 +7,6 @@ import java.util.function.Consumer;
 
 /**
  * The RawHandler object represents a single event handler that is represented by a consumer without an additional method or other wrapper
- *
- * @author <a href="https://github.com/cyklon73">Cyklon73</a>
  */
 class RawHandler<T extends Event> extends Handler<T> {
 
