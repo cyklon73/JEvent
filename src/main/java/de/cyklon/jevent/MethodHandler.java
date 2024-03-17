@@ -39,7 +39,7 @@ class MethodHandler<D> extends Handler<Event> {
 				ParameterInstance pi = parameter.getAnnotation(ParameterInstance.class);
 				if (pi==null) {
 					if (EventManager.class.equals(c)) pInstances.add(null);
-					else pInstances.add(c.getName());
+					else pInstances.add(c.getTypeName());
 				}
 				else pInstances.add(pi.value());
 			}

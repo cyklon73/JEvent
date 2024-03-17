@@ -22,7 +22,7 @@ abstract class Handler<T extends Event> implements Comparable<Handler<T>> {
 
     @SuppressWarnings("unchecked")
     public void invoke(@NotNull EventManager manager, @NotNull Event event) {
-        if(event instanceof Cancellable && ((Cancellable) event).isCancelled() && !ignoreCancelled) return;
+        if(event instanceof Cancellable c && c.isCancelled() && !ignoreCancelled) return;
         if(isSuitableHandler(event.getClass())) invokeEvent(manager, (T) event);
     }
 
