@@ -90,4 +90,9 @@ class MethodHandler<D> extends Handler<Event> {
 	public boolean equals(Object obj) {
 		return obj instanceof MethodHandler<?> mh && mh.handler.equals(this.handler);
 	}
+
+	@Override
+	public String toString() {
+		return super.toString().formatted(handler);
+	}
 }

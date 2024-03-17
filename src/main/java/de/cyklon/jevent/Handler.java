@@ -32,4 +32,15 @@ abstract class Handler<T extends Event> implements Comparable<Handler<T>> {
     public int compareTo(@NotNull Handler o) {
         return Byte.compare(o.priority, this.priority);
     }
+
+    @Override
+    public String toString() {
+        return """
+                %s {
+                    eventType: %s,
+                    priority: %s,
+                    ignoreCancelled: %s,
+                    handler: %s
+                """.formatted(getClass(), eventType, priority, ignoreCancelled, "%s");
+    }
 }

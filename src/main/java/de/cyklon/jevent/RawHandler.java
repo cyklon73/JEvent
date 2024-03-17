@@ -33,4 +33,9 @@ class RawHandler<T extends Event> extends Handler<T> {
     public boolean equals(Object obj) {
         return obj instanceof RawHandler<?> rh && rh.id==this.id;
     }
+
+    @Override
+    public String toString() {
+        return super.toString().formatted(consumer);
+    }
 }
