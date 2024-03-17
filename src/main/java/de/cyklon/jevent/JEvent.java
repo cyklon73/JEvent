@@ -116,12 +116,7 @@ public final class JEvent implements EventManager {
 	@Override
 	public void registerListenerPackage(OfflinePackage pkg) {
 		debug("register listener package " + pkg);
-		ReflectPackage rp = load(pkg);
-		if (rp!=null) processPackage(rp);
-		getPackages(pkg).stream()
-				.map(this::load)
-				.filter(Objects::nonNull)
-				.forEach(this::processPackage);
+		pkg.loadRecursive().forEach(this::processPackage);
 	}
 
 	private void processPackage(ReflectPackage pkg) {
@@ -138,18 +133,6 @@ public final class JEvent implements EventManager {
 		registerListener0(clazz);
 		Listener listener;
 		if (includeSubclasses || (((listener = clazz.getAnnotation(Listener.class)) != null) && listener.includeSubclasses())) clazz.getSubclasses(Filter.all()).forEach(c -> processClass(c, true));
-	}
-
-	private ReflectPackage load(OfflinePackage pkg) {
-		if (pkg.getDirectClasses().isEmpty()) return null;
-		return pkg.load();
-	}
-
-	private Set<ReflectPackage> getPackages(OfflinePackage pkg) {
-		Set<ReflectPackage> result = new HashSet<>();
-		if (!pkg.getDirectClasses().isEmpty()) result.add(pkg.load());
-		pkg.getPackages().forEach(p -> result.addAll(getPackages(p)));
-		return result;
 	}
 
 	@Override
