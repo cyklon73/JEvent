@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains:annotations:22.0.0'
-    implementation "de.cyklon:ReflectionUtils:57d42d8"
+    implementation "de.cyklon:ReflectionUtils:fa134db"
 
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
