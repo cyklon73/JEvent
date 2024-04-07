@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The event base class.
+ * The base class of all Events.
  * Extend this class to create your own event
  */
 public abstract class Event {

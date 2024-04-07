@@ -30,8 +30,8 @@ public @interface EventHandler {
 	/**
 	 * Define if the handler ignores a canceled event.
 	 * <p>
-	 * If ignoreCancelled is true and the event is canceled, the method is
-	 * not called. Otherwise, the method is always called.
+	 * If ignoreCancelled is true and the event is cancelled, the method is still called.
+	 * Otherwise, the method is only called if the event is not cancelled.
 	 *
 	 * @return whether canceled events should be ignored
 	 */
