@@ -22,7 +22,6 @@ public final class JEvent implements EventManager {
 	/**
 	 * @return The Default EventManager instance
 	 */
-	@NotNull
 	public static EventManager getDefaultManager() {
 		return DEFAULT_MANAGER;
 	}
@@ -36,27 +35,25 @@ public final class JEvent implements EventManager {
 		return new JEvent();
 	}
 
-	private final Collection<Handler<?>> handlers = new HashSet<>();
+	private final Collection<Handler<?>> handlerSet = new HashSet<>();
 	private final Map<String, Object> parameterInstances = new HashMap<>();
 	private Consumer<String> logger = null;
 
 	private JEvent() {}
 
-	@NotNull
 	@SuppressWarnings("unchecked")
 	private <T extends Event> Collection<Handler<T>> getHandlers(@NotNull Class<T> event) {
-		return handlers.stream()
+		return handlerSet.stream()
 				.filter(h -> h.isSuitableHandler(event))
 				.map(h -> (Handler<T>) h)
 				.sorted()
 				.toList();
 	}
 
-	@Override
 	public void registerListener(@NotNull Object obj) {
 		debug("register listener " + obj.getClass());
 		Collection<MethodHandler<?>> handlers = MethodHandler.getHandlers(obj);
-		this.handlers.addAll(handlers);
+		this.handlerSet.addAll(handlers);
 		if (isDebugEnabled()) {
 			debug(String.format("%s handlers registered for listener %s:", handlers.size(), obj.getClass()));
 			handlers.forEach(this::debug);
@@ -139,27 +136,24 @@ public final class JEvent implements EventManager {
 	public <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority, boolean ignoreCancelled) {
 		RawHandler<T> rh = new RawHandler<>(event, handler, priority, ignoreCancelled);
 		debug("register handler " + rh);
-		handlers.add(rh);
+		handlerSet.add(rh);
 	}
 
-	@Override
 	@SuppressWarnings("rawtypes")
 	public void unregisterListener(@NotNull Class<?> clazz) {
-		if (handlers.removeIf(h -> h instanceof MethodHandler mh && mh.getListener().getClass().isInstance(clazz))) debug("unregistered listener " + clazz);
+		if (handlerSet.removeIf(h -> h instanceof MethodHandler mh && mh.getListener().getClass().isInstance(clazz))) debug("unregistered listener " + clazz);
 		else debug("listener not unregistered because no listener matches " + clazz);
 	}
 
-	@Override
 	public void unregisterAll() {
 		debug("unregister all handlers");
-		handlers.clear();
+		handlerSet.clear();
 	}
 
-	@Override
-	public boolean callEvent(@NotNull Event event) {
+	public boolean callEvent(Event event) {
 		debug("call event " + event.getClass());
 		getHandlers(event.getClass()).forEach(h -> h.invoke(this, event));
-		return event instanceof Cancellable ce && ce.isCancelled();
+		return event instanceof Cancellable e && e.isCancelled();
 	}
 
 	@Override
