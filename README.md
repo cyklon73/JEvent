@@ -41,12 +41,12 @@ public class Main {
 		//get the default Event manager
 		EventManager manager = JEvent.getDefaultManager();
 
-		//register de listener
+		//register the listener
 		manager.registerListener(MyListener.class);
 		//or
 		manager.registerListener(new MyListener());
 
-		//initalize Event
+		//initialize Event
 		MyEvent event = new MyEvent("MyEventName");
 		
 		System.out.println(event.getName()); //"MyEventName"
