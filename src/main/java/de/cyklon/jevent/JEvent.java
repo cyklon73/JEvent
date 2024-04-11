@@ -134,9 +134,20 @@ public final class JEvent implements EventManager {
 
 	@Override
 	public <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority, boolean ignoreCancelled) {
-		RawHandler<T> rh = new RawHandler<>(event, handler, priority, ignoreCancelled);
+		RawHandler<T, T> rh = new RawHandler<>(event, event, handler, priority, ignoreCancelled);
 		debug("register handler " + rh);
 		handlerSet.add(rh);
+	}
+
+	@Override
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public <T> void registerWrappedHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority, boolean ignoreCancelled) {
+		if (Event.class.isAssignableFrom(event)) registerHandler((Class<? extends Event>)event, e -> handler.accept((T) e), priority, ignoreCancelled);
+		else {
+			RawHandler<WrappedEvent, T> rh = new RawHandler<>(WrappedEvent.class, event, handler, priority, ignoreCancelled);
+			debug("register wrapped handler " + rh);
+			handlerSet.add(rh);
+		}
 	}
 
 	@SuppressWarnings("rawtypes")

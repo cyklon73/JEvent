@@ -49,6 +49,6 @@ public abstract class Event {
 
 	@Override
 	public String toString() {
-		return Event.class + "(" + getEventName() + ")";
+		return Event.class.getName() + "(" + getEventName() + ")";
 	}
 }

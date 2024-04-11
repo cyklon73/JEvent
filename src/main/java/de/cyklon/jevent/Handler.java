@@ -7,17 +7,19 @@ import org.jetbrains.annotations.NotNull;
  */
 abstract class Handler<T extends Event> implements Comparable<Handler<T>> {
     protected Class<? extends Event> eventType;
+    protected Class<?> wrappedType;
     private final byte priority;
     private final boolean ignoreCancelled;
 
-    public Handler(Class<T> eventType, byte priority, boolean ignoreCancelled) {
+    public Handler(Class<T> eventType, Class<?> wrappedType, byte priority, boolean ignoreCancelled) {
         this.eventType = eventType;
+        this.wrappedType = wrappedType;
         this.priority = priority;
         this.ignoreCancelled = ignoreCancelled;
     }
 
     public boolean isSuitableHandler(@NotNull Class<? extends Event> event) {
-        return eventType.isAssignableFrom(event);
+        return eventType.isAssignableFrom(event) || (eventType.equals(WrappedEvent.class) && wrappedType!=null && wrappedType.isAssignableFrom(event));
     }
 
     @SuppressWarnings("unchecked")
@@ -35,6 +37,6 @@ abstract class Handler<T extends Event> implements Comparable<Handler<T>> {
 
     @Override
     public String toString() {
-        return "Handler{eventType: %s, priority: %s, ignoreCancelled: %s, handler: %s}".formatted(eventType, priority, ignoreCancelled, "%s");
+        return "Handler{eventType: %s, priority: %s, ignoreCancelled: %s, handler: %s}".formatted(eventType.equals(WrappedEvent.class) ? String.format("{%s, %s}", WrappedEvent.class, wrappedType) : eventType, priority, ignoreCancelled, "%s");
     }
 }
