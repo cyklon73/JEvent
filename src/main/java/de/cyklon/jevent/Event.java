@@ -31,7 +31,8 @@ public abstract class Event {
 
 	/**
 	 * call all listeners for this event
-	 *
+	 * <p>>
+	 * uses {@link JEvent#getDefaultManager()} as EventManager
 	 * @return true if the event was canceled
 	 * @see EventManager#callEvent(Event)
 	 */
