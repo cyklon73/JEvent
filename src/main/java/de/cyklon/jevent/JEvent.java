@@ -37,6 +37,9 @@ public final class JEvent implements EventManager {
 
 	private final Collection<Handler<?>> handlerSet = new HashSet<>();
 	private final Map<String, Object> parameterInstances = new HashMap<>();
+
+	private final UUID id;
+	private final boolean useInternalEvents;
 	private Consumer<String> logger = null;
 
 	private JEvent() {}
