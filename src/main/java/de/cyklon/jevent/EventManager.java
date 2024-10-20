@@ -13,6 +13,12 @@ import java.util.function.Consumer;
 public sealed interface EventManager permits JEvent {
 
 	/**
+	 * Can only be activated when created
+	 * @return true if internal events enabled
+	 */
+	boolean internalEventsEnabled();
+
+	/**
 	 * registers all {@link MethodHandler EventHandlers} in the listener Class
 	 *
 	 * @param obj the object from which events are to be registered
