@@ -50,6 +50,16 @@ public final class JEvent implements EventManager {
 				.toList();
 	}
 
+	@Override
+	public UUID getId() {
+		return id;
+	}
+
+	@Override
+	public boolean internalEventsEnabled() {
+		return useInternalEvents;
+	}
+
 	public void registerListener(@NotNull Object obj) {
 		debug("register listener " + obj.getClass());
 		Collection<MethodHandler<?>> handlers = MethodHandler.getHandlers(obj);
