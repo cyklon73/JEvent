@@ -1,5 +1,7 @@
 package de.cyklon.jevent;
 
+import de.cyklon.jevent.internal.EventCallJEvent;
+import de.cyklon.jevent.internal.InternalJEvent;
 import de.cyklon.reflection.entities.OfflinePackage;
 import de.cyklon.reflection.entities.ReflectClass;
 import de.cyklon.reflection.entities.ReflectPackage;
@@ -142,7 +144,7 @@ public final class JEvent implements EventManager {
 	}
 
 	@Override
-	public void registerListenerPackage(OfflinePackage pkg) {
+	public void registerListenerPackage(@NotNull OfflinePackage pkg) {
 		debug("register listener package " + pkg);
 		pkg.loadRecursive().forEach(this::processPackage);
 	}
@@ -164,7 +166,7 @@ public final class JEvent implements EventManager {
 	}
 
 	@Override
-	public <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority, boolean ignoreCancelled) {
+	public <T extends Event> void registerHandler(@NotNull Class<T> event, @NotNull Consumer<T> handler, byte priority, boolean ignoreCancelled) {
 		RawHandler<T, T> rh = new RawHandler<>(event, event, handler, priority, ignoreCancelled);
 		debug("register handler " + rh);
 		handlerSet.add(rh);
@@ -218,13 +220,13 @@ public final class JEvent implements EventManager {
 	}
 
 	@Override
-	public @Nullable Object removeParameterInstance(String key) {
+	public @Nullable Object removeParameterInstance(@NotNull String key) {
 		debug("remove parameter instance " + key);
 		return parameterInstances.remove(key);
 	}
 
 	@Override
-	public @Nullable Object getParameterInstance(String key) {
+	public @Nullable Object getParameterInstance(@NotNull String key) {
 		return parameterInstances.get(key);
 	}
 
