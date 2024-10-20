@@ -5,12 +5,25 @@ import de.cyklon.reflection.entities.ReflectClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
  * The EventManager to manage and execute events
  */
 public sealed interface EventManager permits JEvent {
+
+	/**
+	 * Each EventManager has a unique identifier so that it can be uniquely identified for internal events, for example
+	 * @return The unique id of the EventManager
+	 */
+	UUID getId();
+
+	/**
+	 * Can only be activated when created
+	 * @return true if internal events enabled
+	 */
+	boolean internalEventsEnabled();
 
 	/**
 	 * registers all {@link MethodHandler EventHandlers} in the listener Class
@@ -43,7 +56,7 @@ public sealed interface EventManager permits JEvent {
 	 *
 	 * @param packageName the name of the package to be registered as a listener package
 	 */
-	default void registerListenerPackage(String packageName) {
+	default void registerListenerPackage(@NotNull String packageName) {
 		registerListenerPackage(OfflinePackage.get(packageName));
 	}
 
@@ -54,7 +67,7 @@ public sealed interface EventManager permits JEvent {
 	 *
 	 * @param pkg the package
 	 */
-	void registerListenerPackage(OfflinePackage pkg);
+	void registerListenerPackage(@NotNull OfflinePackage pkg);
 
 	/**
 	 * registers a listener for a specific event, with a consumer instead of a method
@@ -65,7 +78,7 @@ public sealed interface EventManager permits JEvent {
 	 * @param ignoreCancelled if true, the handler is not called for {@link EventHandler#ignoreCancelled() canceled events}
 	 * @param <T> the event type
 	 */
-	<T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority, boolean ignoreCancelled);
+	<T extends Event> void registerHandler(@NotNull Class<T> event, @NotNull Consumer<T> handler, byte priority, boolean ignoreCancelled);
 
 	/**
 	 * registers a listener for a specific event, with a consumer instead of a method
@@ -75,7 +88,7 @@ public sealed interface EventManager permits JEvent {
 	 * @param priority the event {@link EventHandler#priority() priority}
 	 * @param <T> the event type
 	 */
-	default <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, byte priority) {
+	default <T extends Event> void registerHandler(@NotNull Class<T> event, @NotNull Consumer<T> handler, byte priority) {
 		registerHandler(event, handler, priority, false);
 	}
 
@@ -87,7 +100,7 @@ public sealed interface EventManager permits JEvent {
 	 * @param ignoreCancelled if true, the handler is not called for {@link EventHandler#ignoreCancelled() canceled events}
 	 * @param <T> the event type
 	 */
-	default <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler, boolean ignoreCancelled) {
+	default <T extends Event> void registerHandler(@NotNull Class<T> event, @NotNull Consumer<T> handler, boolean ignoreCancelled) {
 		registerHandler(event, handler, EventHandler.NORMAL, ignoreCancelled);
 	}
 
@@ -98,7 +111,7 @@ public sealed interface EventManager permits JEvent {
 	 * @param handler The consumer to be executed when the event is called
 	 * @param <T> the event type
 	 */
-	default <T extends Event> void registerHandler(@NotNull Class<T> event, Consumer<T> handler) {
+	default <T extends Event> void registerHandler(@NotNull Class<T> event, @NotNull Consumer<T> handler) {
 		registerHandler(event, handler, EventHandler.NORMAL, false);
 	}
 
@@ -208,7 +221,7 @@ public sealed interface EventManager permits JEvent {
 	 * @return the instance registered to this key, or null if no instance is registered to this key
 	 */
 	@Nullable
-	Object removeParameterInstance(String key);
+	Object removeParameterInstance(@NotNull String key);
 
 	/**
 	 * returns the parameter instance registered to the given key
@@ -216,7 +229,7 @@ public sealed interface EventManager permits JEvent {
 	 * @return the value or null if there is no instance for this key, or the value is set to null
 	 */
 	@Nullable
-	Object getParameterInstance(String key);
+	Object getParameterInstance(@NotNull String key);
 
 	/**
 	 * Sets a logger for debug prints
@@ -240,4 +253,11 @@ public sealed interface EventManager permits JEvent {
 	 * @param logger the consumer with the corresponding log method or null to disable debug messages
 	 */
 	void setDebugLogger(@Nullable Consumer<String> logger);
+
+	/**
+	 * @return true if this EventManager is the Default Manager
+	 */
+	default boolean isDefaultManager() {
+		return JEvent.DEFAULT_MANAGER.getId().equals(getId());
+	}
 }

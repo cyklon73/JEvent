@@ -17,9 +17,12 @@ import java.util.function.Consumer;
  * JEvent provides a powerful and lightweight event system based on the syntax of the <a href="https://www.spigotmc.org/wiki/using-the-event-api/">Spigot event</a> system
  */
 public final class JEvent implements EventManager {
-	static final EventManager DEFAULT_MANAGER = new JEvent();
+	static final EventManager DEFAULT_MANAGER = new JEvent(false);
 
 	/**
+	 * Internal events are deactivated for this EventManager.
+	 * <p> 
+	 * To use internal events, create an EventManager with {@link #createManager(boolean)}
 	 * @return The Default EventManager instance
 	 */
 	public static EventManager getDefaultManager() {
@@ -28,18 +31,36 @@ public final class JEvent implements EventManager {
 
 	/**
 	 * create a new EventManager
-	 * @return the new Created Manager
+	 * <p>
+	 * internal events are deactivated. To enable internal events, use {@link #createManager(boolean)}
+	 * @return the new Created EventManager
 	 */
 	@NotNull
 	public static EventManager createManager() {
-		return new JEvent();
+		return createManager(false);
+	}
+
+	/**
+	 * create a new EventManager
+	 * @param useInternalEvents determines whether internal events are activated for this EventManager
+	 * @return the new Created EventManager
+	 */
+	@NotNull
+	public static EventManager createManager(boolean useInternalEvents) {
+		return new JEvent(useInternalEvents);
 	}
 
 	private final Collection<Handler<?>> handlerSet = new HashSet<>();
 	private final Map<String, Object> parameterInstances = new HashMap<>();
+
+	private final UUID id;
+	private final boolean useInternalEvents;
 	private Consumer<String> logger = null;
 
-	private JEvent() {}
+	private JEvent(boolean useInternalEvents) {
+		this.id = UUID.randomUUID();
+		this.useInternalEvents = useInternalEvents;
+	}
 
 	@SuppressWarnings("unchecked")
 	private <T extends Event> Collection<Handler<T>> getHandlers(@NotNull Class<T> event) {
@@ -48,6 +69,16 @@ public final class JEvent implements EventManager {
 				.map(h -> (Handler<T>) h)
 				.sorted()
 				.toList();
+	}
+
+	@Override
+	public UUID getId() {
+		return id;
+	}
+
+	@Override
+	public boolean internalEventsEnabled() {
+		return useInternalEvents;
 	}
 
 	public void registerListener(@NotNull Object obj) {
@@ -161,9 +192,22 @@ public final class JEvent implements EventManager {
 		handlerSet.clear();
 	}
 
-	public boolean callEvent(Event event) {
-		debug("call event " + event.getClass());
-		getHandlers(event.getClass()).forEach(h -> h.invoke(this, event));
+	public boolean callEvent(@NotNull Event event) {
+		if (InternalJEvent.isInternal(event)) {
+			if (!internalEventsEnabled()) return true;
+		} else {
+			EventCallJEvent ec = new EventCallJEvent(this, event);
+			callEvent(ec);
+			if (ec.isCancelled()) {
+				debug("Event call of " + event.getClass() + " cancelled by internal event");
+				return false;
+			}
+			if (ec.isEventModified()) debug("Event changed by internal event from " + event.getClass() + " to " + ec.getEvent().getClass());
+			event = ec.getEvent();
+			debug("call event " + event.getClass());
+		}
+		Event finalEvent = event;
+		getHandlers(event.getClass()).forEach(h -> h.invoke(this, finalEvent));
 		return event instanceof Cancellable e && e.isCancelled();
 	}
 
