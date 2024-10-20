@@ -11,12 +11,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EventHandler {
-	byte LOWEST = -2;
-	byte LOW = -1;
+	byte LOWEST = Byte.MIN_VALUE;
+	byte LOW = -100;
 	byte NORMAL = 0;
-	byte HIGH = 1;
-	byte HIGHEST = 2;
-	byte MONITOR = 3;
+	byte HIGH = 100;
+	byte HIGHEST = Byte.MAX_VALUE;
 
 	/**
 	 * Define the priority of the event.
