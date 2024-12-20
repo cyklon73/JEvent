@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'de.cyklon'
-version = '1.4.0'
+version = '1.4.1'
 
 var commit = getCommit()
 var release = System.getenv("RELEASE") == "true"
