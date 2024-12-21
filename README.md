@@ -1,4 +1,4 @@
-![[Java CI]](https://github.com/Utils4J/JEvent/actions/workflows/check.yml/badge.svg)
+![[Java CI]](https://github.com/cyklon73/JEvent/actions/workflows/check.yml/badge.svg)
 ![[Latest Version]](https://maven.cyklon.dev/api/badge/latest/releases/de/cyklon/JEvent?prefix=v&name=Latest%20Version&color=0374b5)
 
 # JEvent
