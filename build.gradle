@@ -10,7 +10,7 @@ var commit = getCommit()
 var release = System.getenv("RELEASE") == "true"
 
 repositories {
-    maven { url "https://maven.mineking.dev/releases" }
+    maven { url "https://maven.cyklon.dev/releases" }
     mavenCentral()
 }
 
